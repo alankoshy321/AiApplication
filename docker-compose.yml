@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  weaviate:
+    image: semitechnologies/weaviate:1.25.0
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      QUERY_DEFAULTS_LIMIT: 20
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      DEFAULT_VECTORIZER_MODULE: "none"
+      CLUSTER_HOSTNAME: "weaviate"
+
+  app:
+    build: .
+    depends_on:
+      - weaviate
+    ports:
+      - "8000:8000"
+    environment:
+      WEAVIATE_URL: http://weaviate:8080
+      COLLECTION_NAME: Document
+      EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
+      GPT4ALL_MODEL: ggml-gpt4all-j-v1.3-groovy
+      USE_MOCK_LLM: "true"
+
+
